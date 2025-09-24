@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Cost Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            background: #e2e8f0;
+            color: #4f46e5;
+        }
+
+        .tab.active {
+            background: white;
+            color: #4f46e5;
+            border-bottom: 3px solid #4f46e5;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section h3 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .service-name {
+            font-weight: 600;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .service-unit {
+            font-size: 0.9rem;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .service-description {
+            color: #64748b;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .rate-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .currency {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .summary-card {
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .revenue-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .costs-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .expenses-card {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .profit-card {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid rgba(255,255,255,0.3);
+            margin-top: 15px;
+            padding-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .calculation-info {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .calculation-info h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .calculation-breakdown {
+            font-size: 0.9rem;
+            color: #1e40af;
+            line-height: 1.5;
+        }
+
+        .expense-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .expense-item input[type="text"] {
+            flex: 1;
+        }
+
+        .expense-item input[type="number"] {
+            width: 150px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-calculator"></i>
+                Construction Cost Calculator
+            </h1>
+            <p>Professional project estimation and expense tracking</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('services')">
+                <i class="fas fa-cog"></i>
+                Services & Rates
+            </button>
+            <button class="tab" onclick="showTab('project')">
+                <i class="fas fa-chart-bar"></i>
+                Project Details
+            </button>
+            <button class="tab" onclick="showTab('expenses')">
+                <i class="fas fa-dollar-sign"></i>
+                Expenses
+            </button>
+            <button class="tab" onclick="showTab('summary')">
+                <i class="fas fa-calculator"></i>
+                Summary
+            </button>
+        </div>
+
+        <!-- Services Tab -->
+        <div id="services" class="tab-content active">
+            <h2 style="color: #1e293b; margin-bottom: 25px; font-size: 1.8rem;">Service Rates Configuration</h2>
+            
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name">Contract for Bar Bending</div>
+                    <div class="service-unit">Per Ton</div>
+                </div>
+                <div class="service-description">Expert team</div>
+                <div class="rate-input-group">
+                    <span class="currency">₹</span>
+                    <input type="number" id="rate-barBending" value="7500" onchange="updateCalculations()" style="width: 120px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    <span class="currency">/-</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name">Ply Shuttering</div>
+                    <div class="service-unit">Per Sqm</div>
+                </div>
+                <div class="service-description">Modern equipment & faster execution</div>
+                <div class="rate-input-group">
+                    <span class="currency">₹</span>
+                    <input type="number" id="rate-plyShuttering" value="250" onchange="updateCalculations()" style="width: 120px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    <span class="currency">/-</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name">Board Making</div>
+                    <div class="service-unit">Per Board</div>
+                </div>
+                <div class="service-description">Quality materials & precision work</div>
+                <div class="rate-input-group">
+                    <span class="currency">₹</span>
+                    <input type="number" id="rate-boardMaking" value="45" onchange="updateCalculations()" style="width: 120px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    <span class="currency">/-</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name">RCC Works (M-25 Grade)</div>
+                    <div class="service-unit">Per Cum</div>
+                </div>
+                <div class="service-description">Complete pumping, pouring & curing</div>
+                <div class="rate-input-group">
+                    <span class="currency">₹</span>
+                    <input type="number" id="rate-rccWorks" value="220" onchange="updateCalculations()" style="width: 120px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    <span class="currency">/-</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name">Lifting & Shifting</div>
+                    <div class="service-unit">Percentage</div>
+                </div>
+                <div class="service-description">Efficient logistics management</div>
+                <div class="rate-input-group">
+                    <input type="number" id="rate-liftingShifting" value="3" onchange="updateCalculations()" style="width: 120px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    <span class="currency">%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Details Tab -->
+        <div id="project" class="tab-content">
+            <h2 style="color: #1e293b; margin-bottom: 25px; font-size: 1.8rem;">Project Details</h2>
+            
+            <div class="section">
+                <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Total Area (Sq Ft)</label>
+                        <input type="number" id="totalArea" onchange="updateCalculations()" placeholder="Enter total project area in sq ft">
+                    </div>
+                    <div class="form-group">
+                        <label>Contract Rate (₹ per Sq Ft)</label>
+                        <input type="number" id="contractRate" onchange="updateCalculations()" placeholder="Enter rate per sq ft">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3><i class="fas fa-tasks"></i> Service Quantities</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Bar Bending (Tons)</label>
+                        <input type="number" id="qty-barBending" onchange="updateCalculations()" placeholder="Enter tons">
+                    </div>
+                    <div class="form-group">
+                        <label>Ply Shuttering (Sqm)</label>
+                        <input type="number" id="qty-plyShuttering" onchange="updateCalculations()" placeholder="Enter sqm">
+                    </div>
+                    <div class="form-group">
+                        <label>Board Making (Boards)</label>
+                        <input type="number" id="qty-boardMaking" onchange="updateCalculations()" placeholder="Enter number of boards">
+                    </div>
+                    <div class="form-group">
+                        <label>RCC Works (Cum)</label>
+                        <input type="number" id="qty-rccWorks" onchange="updateCalculations()" placeholder="Enter cum">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expenses Tab -->
+        <div id="expenses" class="tab-content">
+            <h2 style="color: #1e293b; margin-bottom: 25px; font-size: 1.8rem;">Expense Management</h2>
+            
+            <div class="section">
+                <h3><i class="fas fa-users"></i> Labour Expenses</h3>
+                <div class="grid-4">
+                    <div class="form-group">
+                        <label>Labour Wage (₹ per person per day)</label>
+                        <input type="number" id="labourWage" onchange="updateCalculations()" placeholder="Enter daily wage">
+                    </div>
+                    <div class="form-group">
+                        <label>Labour Count (Number of workers)</label>
+                        <input type="number" id="labourCount" onchange="updateCalculations()" placeholder="Enter number of workers">
+                    </div>
+                    <div class="form-group">
+                        <label>Working Days</label>
+                        <input type="number" id="workingDays" onchange="updateCalculations()" placeholder="Enter working days">
+                    </div>
+                    <div class="form-group">
+                        <label>Weekly Allowance (₹ per labour per week)</label>
+                        <input type="number" id="weeklyAllowance" onchange="updateCalculations()" placeholder="Enter weekly allowance">
+                    </div>
+                </div>
+                
+                <div class="calculation-info">
+                    <h4>Labour Cost Breakdown</h4>
+                    <div class="calculation-breakdown">
+                        <div>Daily Labour Cost: ₹<span id="dailyLabourCost">0</span></div>
+                        <div>Weekly Allowance Cost: ₹<span id="weeklyAllowanceCost">0</span></div>
+                        <div><strong>Total Labour Cost: ₹<span id="totalLabourCost">0</span></strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3><i class="fas fa-tools"></i> Other Expenses</h3>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Miscellaneous Expenses (₹)</label>
+                    <input type="number" id="miscExpenses" onchange="updateCalculations()" placeholder="Enter miscellaneous expenses">
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="color: #374151;">Additional Expenses</h4>
+                        <button class="btn btn-primary" onclick="addAdditionalExpense()">
+                            <i class="fas fa-plus"></i>
+                            Add Expense
+                        </button>
+                    </div>
+                    <div id="additionalExpenses"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Tab -->
+        <div id="summary" class="tab-content">
+            <h2 style="color: #1e293b; margin-bottom: 25px; font-size: 1.8rem;">Project Summary & Calculations</h2>
+            
+            <!-- Revenue Section -->
+            <div class="summary-card revenue-card">
+                <h3><i class="fas fa-money-bill-wave"></i> Revenue</h3>
+                <div class="summary-row">
+                    <span>Total Area:</span>
+                    <span id="summary-area">0 Sq Ft</span>
+                </div>
+                <div class="summary-row">
+                    <span>Contract Rate:</span>
+                    <span id="summary-rate">₹0 per Sq Ft</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total Revenue:</span>
+                    <span id="summary-revenue">₹0</span>
+                </div>
+            </div>
+
+            <!-- Service Costs -->
+            <div class="summary-card costs-card">
+                <h3><i class="fas fa-hard-hat"></i> Service Costs</h3>
+                <div class="summary-row">
+                    <span>Bar Bending:</span>
+                    <span id="cost-barBending">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Ply Shuttering:</span>
+                    <span id="cost-plyShuttering">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Board Making:</span>
+                    <span id="cost-boardMaking">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>RCC Works:</span>
+                    <span id="cost-rccWorks">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Lifting & Shifting:</span>
+                    <span id="cost-liftingShifting">₹0</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total Service Costs:</span>
+                    <span id="total-service-costs">₹0</span>
+                </div>
+            </div>
+
+            <!-- Expenses -->
+            <div class="summary-card expenses-card">
+                <h3><i class="fas fa-receipt"></i> Expenses Breakdown</h3>
+                <div class="summary-row">
+                    <span>Daily Labour Cost:</span>
+                    <span id="summary-daily-labour">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Weekly Allowance:</span>
+                    <span id="summary-weekly-allowance">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Miscellaneous Expenses:</span>
+                    <span id="summary-misc">₹0</span>
+                </div>
+                <div id="summary-additional-expenses"></div>
+                <div class="summary-row total">
+                    <span>Total Expenses:</span>
+                    <span id="total-expenses">₹0</span>
+                </div>
+            </div>
+
+            <!-- Final Profit/Loss -->
+            <div class="summary-card profit-card">
+                <h3><i class="fas fa-chart-line"></i> Final Summary</h3>
+                <div class="summary-row">
+                    <span>Total Revenue:</span>
+                    <span id="final-revenue">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Total Service Costs:</span>
+                    <span id="final-service-costs">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Total Expenses:</span>
+                    <span id="final-expenses">₹0</span>
+                </div>
+                <div class="summary-row total" style="border-top: 3px solid rgba(255,255,255,0.5); font-size: 1.3rem;">
+                    <span>Net Profit/Loss:</span>
+                    <span id="net-profit">₹0</span>
+                </div>
+                <div class="summary-row" style="font-size: 1rem;">
+                    <span>Profit Margin:</span>
+                    <span id="profit-margin">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let additionalExpenseCount = 0;
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function addAdditionalExpense() {
+            additionalExpenseCount++;
+            const container = document.getElementById('additionalExpenses');
+            const expenseDiv = document.createElement('div');
+            expenseDiv.className = 'expense-item';
+            expenseDiv.innerHTML = `
+                <input type="text" placeholder="Expense description" id="additional-name-${additionalExpenseCount}">
+                <input type="number" placeholder="Amount" id="additional-amount-${additionalExpenseCount}" onchange="updateCalculations()">
+                <button class="btn btn-danger" onclick="removeAdditionalExpense(this)">
+                    <i class="fas fa-trash"></i>
+                    Remove
+                </button>
+            `;
+            container.appendChild(expenseDiv);
+        }
+
+        function removeAdditionalExpense(button) {
+            button.parentElement.remove();
+            updateCalculations();
+        }
+
+        function getValue(id) {
+            const element = document.getElementById(id);
+            return element ? parseFloat(element.value) || 0 : 0;
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN').format(Math.round(amount));
+        }
+
+        function updateCalculations() {
+            // Get all values
+            const totalArea = getValue('totalArea');
+            const contractRate = getValue('contractRate');
+            
+            const qtyBarBending = getValue('qty-barBending');
+            const qtyPlyShuttering = getValue('qty-plyShuttering');
+            const qtyBoardMaking = getValue('qty-boardMaking');
+            const qtyRccWorks = getValue('qty-rccWorks');
+            
+            const rateBarBending = getValue('rate-barBending');
+            const ratePlyShuttering = getValue('rate-plyShuttering');
+            const rateBoardMaking = getValue('rate-boardMaking');
+            const rateRccWorks = getValue('rate-rccWorks');
+            const rateLiftingShifting = getValue('rate-liftingShifting');
+            
+            const labourWage = getValue('labourWage');
+            const labourCount = getValue('labourCount');
+            const workingDays = getValue('workingDays');
+            const weeklyAllowance = getValue('weeklyAllowance');
+            const miscExpenses = getValue('miscExpenses');
+
+            // Calculate service costs
+            const costBarBending = qtyBarBending * rateBarBending;
+            const costPlyShuttering = qtyPlyShuttering * ratePlyShuttering;
+            const costBoardMaking = qtyBoardMaking * rateBoardMaking;
+            const costRccWorks = qtyRccWorks * rateRccWorks;
+            
+            const subtotalServices = costBarBending + costPlyShuttering + costBoardMaking + costRccWorks;
+            const costLiftingShifting = subtotalServices * (rateLiftingShifting / 100);
+            const totalServiceCosts = subtotalServices + costLiftingShifting;
+
+            // Calculate labour expenses
+            const dailyLabourCost = labourWage * labourCount * workingDays;
+            const weeksWorked = Math.ceil(workingDays / 7);
+            const weeklyAllowanceCost = weeklyAllowance * labourCount * weeksWorked;
+            const totalLabourCost = dailyLabourCost + weeklyAllowanceCost;
+
+            // Calculate additional expenses
+            let additionalTotal = 0;
+            const additionalExpenses = document.querySelectorAll('[id^="additional-amount-"]');
+            additionalExpenses.forEach(input => {
+                additionalTotal += parseFloat(input.value) || 0;
+            });
+
+            const totalExpenses = totalLabourCost + miscExpenses + additionalTotal;
+            const totalRevenue = totalArea * contractRate;
+            const netProfit = totalRevenue - totalServiceCosts - totalExpenses;
+            const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100) : 0;
+
+            // Update labour cost breakdown
+            document.getElementById('dailyLabourCost').textContent = formatCurrency(dailyLabourCost);
+            document.getElementById('weeklyAllowanceCost').textContent = formatCurrency(weeklyAllowanceCost);
+            document.getElementById('totalLabourCost').textContent = formatCurrency(totalLabourCost);
+
+            // Update summary
+            document.getElementById('summary-area').textContent = formatCurrency(totalArea) + ' Sq Ft';
+            document.getElementById('summary-rate').textContent = '₹' + formatCurrency(contractRate) + ' per Sq Ft';
+            document.getElementById('summary-revenue').textContent = '₹' + formatCurrency(totalRevenue);
+
+            document.getElementById('cost-barBending').textContent = '₹' + formatCurrency(costBarBending);
+            document.getElementById('cost-plyShuttering').textContent = '₹' + formatCurrency(costPlyShuttering);
+            document.getElementById('cost-boardMaking').textContent = '₹' + formatCurrency(costBoardMaking);
+            document.getElementById('cost-rccWorks').textContent = '₹' + formatCurrency(costRccWorks);
+            document.getElementById('cost-liftingShifting').textContent = '₹' + formatCurrency(costLiftingShifting);
+            document.getElementById('total-service-costs').textContent = '₹' + formatCurrency(totalServiceCosts);
+
+            document.getElementById('summary-daily-labour').textContent = '₹' + formatCurrency(dailyLabourCost);
+            document.getElementById('summary-weekly-allowance').textContent = '₹' + formatCurrency(weeklyAllowanceCost);
+            document.getElementById('summary-misc').textContent = '₹' + formatCurrency(miscExpenses);
+            
+            // Update additional expenses in summary
+            let additionalSummaryHtml = '';
+            const additionalNames = document.querySelectorAll('[id^="additional-name-"]');
+            const additionalAmounts = document.querySelectorAll('[id^="additional-amount-"]');
+            
+            for (let i = 0; i < additionalNames.length; i++) {
+                const name = additionalNames[i].value || `Additional Expense ${i + 1}`;
+                const amount = parseFloat(additionalAmounts[i].value) || 0;
+                additionalSummaryHtml += `
+                    <div class="summary-row">
+                        <span>${name}:</span>
+                        <span>₹${formatCurrency(amount)}</span>
+                    </div>
+                `;
+            }
+            document.getElementById('summary-additional-expenses').innerHTML = additionalSummaryHtml;
+
+            document.getElementById('total-expenses').textContent = '₹' + formatCurrency(totalExpenses);
+
+            document.getElementById('final-revenue').textContent = '₹' + formatCurrency(totalRevenue);
+            document.getElementById('final-service-costs').textContent = '₹' + formatCurrency(totalServiceCosts);
+            document.getElementById('final-expenses').textContent = '₹' + formatCurrency(totalExpenses);
+            
+            const netProfitElement = document.getElementById('net-profit');
+            const profitMarginElement = document.getElementById('profit-margin');
+            
+            netProfitElement.textContent = '₹' + formatCurrency(netProfit);
+            profitMarginElement.textContent = profitMargin.toFixed(2) + '%';
+            
+            // Color coding for profit/loss
+            if (netProfit >= 0) {
+                netProfitElement.style.color = '#10b981';
+                profitMarginElement.style.color = '#10b981';
+            } else {
+                netProfitElement.style.color = '#ef4444';
+                profitMarginElement.style.color = '#ef4444';
+            }
+        }
+
+        // Initialize calculations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCalculations();
+        });
+    </script>
+</body>
+</html>
